@@ -41,5 +41,8 @@ export const userApi = {
         createCategoryInstallment :"category/installment/create",
         deleteCategoryInstallment :"category/installment/delete",
         updateCategoryInstallment :"category/installment/update",
+        fetchOrders: "order/list",
+        updateOrder:"order/update",
+        fetchOrderDetails:"order/details/list"
     }
 }

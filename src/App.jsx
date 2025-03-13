@@ -8,6 +8,7 @@ import { conifgs } from "./config";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import LoginPage from "./pages/LoginPage/LoginPage";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -20,7 +21,7 @@ export default function App() {
     const token = Cookies.get("laserget_refresh_token");
     if (!token) {
       navigate("/login");
-      return;
+      // return <LoginPage />;
     }
 
    const refreshAuthToken = async () => {
@@ -68,8 +69,6 @@ export default function App() {
       <DefaultLayout>
         <AppRoutes />
       </DefaultLayout>
-      asasd;lfkadksfjksldfn
-
       <ToastContainer />
     </div>
   );

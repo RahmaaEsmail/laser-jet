@@ -51,7 +51,7 @@ export default function EditProductModal({
       });
     }
        if(rowData?.image?.length >0) {
-        rowData?.image?.forEach((item,index) => formData.append(`image[${index}]`, item))
+        rowData?.image?.forEach((item,index) => formData.append(`image`, item))
        }
     dispatch(editProduct(formData))
       .then((res) => {
@@ -100,7 +100,7 @@ export default function EditProductModal({
       footer={null}
     >
       <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <div className="input-group">
             <label>{t("titleText")}</label>
             <input
@@ -124,6 +124,7 @@ export default function EditProductModal({
           </div>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
         <div className="input-group">
           <label>{t("productCodeText")}</label>
           <input
@@ -131,6 +132,16 @@ export default function EditProductModal({
             value={rowData.sympol}
             onChange={(e) => setRowData({ ...rowData, sympol: e.target.value })}
           />
+        </div>
+
+        <div className="input-group">
+          <label>{t("productQuantity")}</label>
+          <input
+            type="text"
+            value={rowData.quantity}
+            onChange={(e) => setRowData({ ...rowData, quantity: e.target.value })}
+          />
+        </div>
         </div>
 
         <div className="input-group">

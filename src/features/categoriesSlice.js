@@ -23,6 +23,16 @@ export const deleteCategories = createAsyncThunk("categoriesSlice/deleteCategori
     return response;
 } )
 
+export const handleDeleteInstallment= createAsyncThunk("categoriesSlice/handleDeleteInstallment",async(body) => {
+    const response = await fetchData({url:userApi.routes.deleteInstallment , body , method:"DELETE"});
+    return response;
+})
+
+export const handleEditInstallment= createAsyncThunk("categoriesSlice/handleEditInstallment",async(body) => {
+    const response = await fetchData({url:userApi.routes.updateInstallment , body , method:"PUT"});
+    return response;
+})
+
 export const handleCreateInstallmentCategory = createAsyncThunk("categoriesSlice/handleCreateInstallmentCategory",async(body) => {
     const response  = await fetchData({url: userApi.routes.createCategoryInstallment , method :"POST" , body});
     return  response;
@@ -47,6 +57,7 @@ const initialState = {
   addInstallment:false,
   editInstallment:false,
   deleteLoading:false,
+  deleteInstallmentLoading:false,
   deleteCategoryInstallmentLoading:false,
   updateCategoryInstallmentLoading:false,
   loading:false,
@@ -130,6 +141,24 @@ export const categoriesSlice = createSlice({
         }),
         builder.addCase(handleEditInstallmentCategory.rejected ,(state , action) => {
             state.updateCategoryInstallmentLoading = false
+        })
+        builder.addCase(handleDeleteInstallment.pending ,(state , action) => {
+            state.deleteInstallmentLoading = true
+        }),
+        builder.addCase(handleDeleteInstallment.fulfilled ,(state , action) => {
+            state.deleteInstallmentLoading = false
+        }),
+        builder.addCase(handleDeleteInstallment.rejected ,(state , action) => {
+            state.deleteInstallmentLoading = false
+        })
+        builder.addCase(handleEditInstallment.pending ,(state , action) => {
+            state.editInstallment = true
+        }),
+        builder.addCase(handleEditInstallment.fulfilled ,(state , action) => {
+            state.editInstallment = false
+        }),
+        builder.addCase(handleEditInstallment.rejected ,(state , action) => {
+            state.editInstallment = false
         })
     }
 })

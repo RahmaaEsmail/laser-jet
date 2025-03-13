@@ -319,7 +319,7 @@ export default function EmployeePage() {
           <Spin size="large" />
         </div>
       ) : (
-        <Table columns={columns} dataSource={employees?.data?.rows} />
+        <Table scroll={{x:"max-content"}} columns={columns} dataSource={employees?.data?.rows} />
       )}
     </div>
   );

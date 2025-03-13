@@ -36,7 +36,8 @@ export default function ProductSections() {
     }
   ])
   const [installmentData , setInstallmentData] = useState({
-    installment_title:""
+    installment_title:"",
+    installment_number:null
   })
   const [openViewInstallment , setOpenViewInstallment]= useState(false)
   const [selectedInputs , setSelectedInputs] = useState([])
@@ -175,11 +176,7 @@ export default function ProductSections() {
           </Dropdown>
         )
       }
-      // <div className="flex gap-3 items-center">
-      //   <button className="bg-[#0d6efd] text-white rounded-md p-2 flex justify-center items-center">{t("addInstallmentsText")}</button>
-      //   <button className="bg-[#0d6efd] text-white rounded-md p-3 flex justify-center items-center">{t("addInstallmentsText")}</button>
-      //   <button className="bg-[#0d6efd] text-white rounded-md p-3 flex justify-center items-center">{t("addInstallmentsText")}</button>
-      // </div>
+
     }
   ]
 
@@ -212,7 +209,8 @@ export default function ProductSections() {
 
   function handleSubmitInstallment() {
      const data_send = {
-      ...installmentData
+      installment_number : installmentData?.installment_number,
+      installment_title: installmentData?.installment_title
      }
     console.log(data_send)
      dispatch(handleCreateInstallMent(data_send))
@@ -220,8 +218,8 @@ export default function ProductSections() {
       console.log(res)
       if(res?.payload?.success) {
         toast.success(res?.payload?.message);
+        setInstallmentData({installment_title :"" , installment_number : ""})
         dispatch(handleFetchInstallment());
-        setInstallmentData({installment_title :""})
         setOpenInstallmentsModal(false)
       }else {
         toast.error(res?.payload || "هناك خطأ أثناء اضافه قسط")
@@ -238,10 +236,10 @@ export default function ProductSections() {
   return (
     <div>
       <div className="flex gap-3 justify-between my-4">
-        <h3 className="font-semibold text-[25px] text-[#0d6efd]">{t("categoriesText")}</h3>
+        <h3 className="font-semibold text-[20px] md:text-[25px] text-[#0d6efd]">{t("categoriesText")}</h3>
         <button
           onClick={() => setOpenAddModal(true)}
-          className="bg-[#0d6efd] text-white rounded-md p-3 flex justify-center items-center"
+          className="bg-[#0d6efd] text-white rounded-md p-1 md:p-3 flex justify-center items-center"
         >
           {t("addCategory")}
         </button>
@@ -269,14 +267,19 @@ export default function ProductSections() {
 
        
       <Modal footer={null} open={openViewInstallment} onCancel={() => setOpenViewInstallment(false)} onClose={() => setOpenViewInstallment(false)} okText={t("addText")} cancelText={t("cancelText")} title={t("viewInstallmentsText")}>
-         <Table columns={installmentsColumns} dataSource={rowData?.installments ||[]} />
+         <Table scroll={{x:"max-content"}} columns={installmentsColumns} dataSource={rowData?.installments ||[]} />
       </Modal>
 
       <Modal onOk={handleSubmitInstallment} open={openInstallmentsModal} onCancel={() => setOpenInstallmentsModal(false)} okText={installmentAddLoading ? t("loadingText") : t("addText")}  cancelText={t("cancelText")} onClose={() => setOpenInstallmentsModal(false)} title="">
-         <div>
+         <div className="flex flex-col gap-3">
             <div className="input-group">
               <label>{t("installmentTitle")}</label>
-              <input type="text" onChange={(e) => setInstallmentData({...installmentData , installment_title : e.target.value})} value={installmentData.installment_title}/>
+              <input required type="text" onChange={(e) => setInstallmentData({...installmentData , installment_title : e.target.value})} value={installmentData.installment_title}/>
+            </div>
+
+            <div className="input-group">
+              <label>{t("installment_number")}</label>
+              <input required type="text" onChange={(e) => setInstallmentData({...installmentData , installment_number: e.target.value})} value={installmentData.installment_number}/>
             </div>
          </div>
          </Modal>
@@ -352,7 +355,7 @@ export default function ProductSections() {
       />
      
       <input placeholder={t("searchText")}  onChange={(e) => setSearchVal(e.target.value)} className="my-3 border border-gray-200 outline-hidden p-3 rounded-md w-full"/>
-      {loading ? <div className="h-screen flex justify-center items-center"><Spin size="large"/></div> : <Table columns={columns} dataSource={data?.data?.categories ||[]} />}
+      {loading ? <div className="h-screen flex justify-center items-center"><Spin size="large"/></div> : <Table scroll={{x : "max-content"}} columns={columns} dataSource={data?.data?.categories ||[]} />}
     </div>
   );
 }

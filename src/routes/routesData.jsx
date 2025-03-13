@@ -44,6 +44,8 @@ import SettingsPage from "../pages/SettingsPage/SettingsPage";
 import { FcSettings } from "react-icons/fc";
 import AboutUs from "../pages/AboutUs/AboutUs";
 import Orders from "../pages/Orders/Orders";
+import OrderDetails from "../pages/Orders/OrderDetails/OrderDetails";
+import CreateOrder from "../pages/Orders/CreateOrder/CreateOrder";
 
 export const routesData = [
   {
@@ -211,7 +213,16 @@ export const routesData = [
     path:"/orders",
     hidden:false
   },
-  ,
+  {
+    id:26,
+    labelAr:"تفاصيل الطلب",
+    labelEn:"Order Details",
+    component:OrderDetails,
+    icon:FaJediOrder,
+    path:"/ordersDetails/:id",
+    hidden:true
+  },
+  
  
   {
     id: 13,
@@ -347,4 +358,10 @@ export const routesData = [
     component :LoginPage,
     path:"/login"
   },
+  {
+    id:27,
+    hidden:true,
+    component : CreateOrder,
+    path : "create_order"
+  }
 ];

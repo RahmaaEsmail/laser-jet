@@ -25,7 +25,7 @@ export default function AddProductModal({ open, setOpen }) {
     category_id: "",
     image:[],
     sympol: "",
-    quantity:0
+    quantity:1
   });
   const [treeData , setTreeData] = useState({
     label:"",
@@ -68,12 +68,12 @@ export default function AddProductModal({ open, setOpen }) {
     formData.append("price", productData.price);
     formData.append("is_active", productData.is_active);
     formData.append("category_id", productData.category_id);
-    // formData.append("image", productData.image);
+    // formData.append("image", JSON.stringify(productData.image));
     formData.append("sympol", productData.sympol);
-    formData.append("quantity", productData.quantity);
+    formData.append("quantity", +productData.quantity);
     
     productData.image.forEach((detail, index) => {
-      formData.append(`image[${index}]`, detail);
+      formData.append(`image`, detail);
     });
 
     details.forEach((detail, index) => {
@@ -94,7 +94,7 @@ export default function AddProductModal({ open, setOpen }) {
             category_id: "",
             image: "",
             sympol: "",
-            quantity:0,
+            quantity:1,
           });
           setDetails([
             {
@@ -106,28 +106,11 @@ export default function AddProductModal({ open, setOpen }) {
           setOpen(false);
         } else {
           toast.error(res?.payload || "There's an error while adding product");
-          setOpen(false);
         }
       })
       .catch((e) => console.log(e))
       .finally(() => {
-        setProductData({
-          title: "",
-          description: "",
-          price: "",
-          is_active: false,
-          category_id: "",
-          image: "",
-          sympol: "",
-          quantity:0
-        });
-        setDetails([
-          {
-            id: 1,
-            label: "",
-            value: "",
-          },
-        ]);
+
       });
   }
 
@@ -153,7 +136,7 @@ export default function AddProductModal({ open, setOpen }) {
       footer={null}
     >
       <div className="flex flex-col gap-3">
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           <div className="input-group">
             <label>{t("titleText")}</label>
             <input
@@ -177,7 +160,7 @@ export default function AddProductModal({ open, setOpen }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid  grid-cols-1 md:grid-cols-2 gap-2">
         <div className="input-group">
           <label>{t("productCodeText")}</label>
           <input
@@ -218,7 +201,7 @@ export default function AddProductModal({ open, setOpen }) {
               setProductData({ ...productData, category_id: +e.target.value })
             }
           >
-            <option disabled selected>
+            <option value="" disabled selected>
               Select category...
             </option>
             {data?.data?.categories?.map((item) => (
@@ -263,7 +246,7 @@ export default function AddProductModal({ open, setOpen }) {
           />
         </div>
 
-        {productData.image.length > 0 && <div className="grid grid-cols-3">
+        {productData.image.length > 0 && <div className="grid grid-cols-1 md:grid-cols-3">
           {productData.image.map((item ,idx) => 
           <div className="flex gap-2 items-center" key={idx}>
             <img src={URL.createObjectURL(item)} className="w-[100px] h-[100px] object-cover rounded-md"/>
@@ -288,6 +271,7 @@ export default function AddProductModal({ open, setOpen }) {
                 className="p-2 border border-gray-200 outline-hidden rounded-md w-full"
                 type="text"
                 placeholder="label"
+                value={item?.label}
                 onChange={(e) =>
                   setDetails(
                     details.map((detail) =>
@@ -302,6 +286,7 @@ export default function AddProductModal({ open, setOpen }) {
                 className="p-2 border border-gray-200 outline-hidden rounded-md w-full"
                 type="text"
                 placeholder="Value"
+                value={item?.value}
                 onChange={(e) =>
                   setDetails(
                     details.map((detail) =>
@@ -320,7 +305,7 @@ export default function AddProductModal({ open, setOpen }) {
           ))}
         </div>
 
-        <div className="flex gap-2 items-center mt04">
+        <div className="flex gap-2 items-center mt-4">
           <Switch
             defaultChecked={productData.is_active}
             onChange={(e) => setProductData({ ...productData, is_active: e })}

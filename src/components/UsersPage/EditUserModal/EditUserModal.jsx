@@ -12,42 +12,44 @@ export default function EditUserModal({ open, setOpen , rowData , setRowData }) 
     const {t} = useTranslation();
     console.log(rowData)
 
-    // function handleSubmit(e) {
-    //     e.preventDefault();
+    function handleSubmit(e) {
+        e.preventDefault();
         
-    //     if (!rowData.name) {
-    //         toast.warn("برجاء ادخال الاسم اولا!");
-    //         return;
-    //     }
-    //     if (!rowData.password) {
-    //         toast.warn("برجاء ادخال كلمه السر اولا!");
-    //         return;
-    //     }
-    //     if (!rowData.phone) {
-    //         toast.warn("برجاء ادخال   رقم الهاتف اولا !");
-    //         return;
-    //     }
+        if (!rowData.username) {
+            toast.warn("برجاء ادخال الاسم اولا!");
+            return;
+        }
+        if (!rowData.email) {
+            toast.warn("برجاء ادخال  البريد الالكتروني اولا!");
+            return;
+        }
+        if (!rowData.phone) {
+            toast.warn("برجاء ادخال   رقم الهاتف اولا !");
+            return;
+        }
 
 
 
-    //     const formData = new FormData();
-    //     formData.append("username", userData.name);
-    //     formData.append("password", userData.password);
-    //     formData.append("phone", userData.phone);
-    //     const data_send = {username:rowData.name,password:rowData.password ,phone:rowData.phone}
-    //     dispatch(updateUser(data_send)).then(res => {
-    //         console.log(res)
-    //         if (res?.payload?.success) {
-    //             toast.success(res?.payload?.message)
-    //             dispatch(fetchUsers())
-    //             setOpen(false)
-    //             setRowData({})
+        const formData = new FormData();
+        formData.append("username", rowData.username);
+        formData.append("email", rowData.email);
+        formData.append("phone", rowData.phone);
+        if(rowData?.password)
+        formData.append("password", rowData.password);
+        // const data_send = {username:rowData.name,password:rowData.password ,phone:rowData.phone}
+        dispatch(updateUser(formData)).then(res => {
+            console.log(res)
+            if (res?.payload?.success) {
+                toast.success(res?.payload?.message)
+                dispatch(fetchUsers())
+                setOpen(false)
+                setRowData({})
 
-    //         } else {
-    //             toast.error(res?.payload?.message || "There's error while creating employee")
-    //         }
-    //     }).catch(e => console.log(e))
-    // }
+            } else {
+                toast.error(res?.payload?.message || "There's error while creating employee")
+            }
+        }).catch(e => console.log(e))
+    }
     return (
         <Modal
             title={t("editUserText")}
@@ -57,13 +59,13 @@ export default function EditUserModal({ open, setOpen , rowData , setRowData }) 
             onClose={() => setOpen(false)}
             footer={null}
         >
-            <form  className="flex flex-col gap-3">
+            <form onSubmit={handleSubmit}  className="flex flex-col gap-3">
                 <div className="grid grid-cols-2 gap-3 items-center">
                     <div className="w-full input-group ">
                         <label>{t("fullName")}</label>
                         <input
                             value={rowData.username}
-                            onChange={(e) => setRowData({...rowData,name:e.target.value})}
+                            onChange={(e) => setRowData({...rowData,username:e.target.value})}
                             type="text"
                             placeholder={t("fullName")}
                         />
@@ -85,6 +87,18 @@ export default function EditUserModal({ open, setOpen , rowData , setRowData }) 
 
 
                 <div className="w-full input-group ">
+                    <label>{t("email")}</label>
+                    <input
+                        value={rowData?.email}
+                        onChange={(e) =>
+                            setRowData({ ...rowData, email: e.target.value })
+                        }
+                        type="email"
+                        placeholder=""
+                    />
+                </div>
+
+                <div className="w-full input-group ">
                     <label>{t("password")}</label>
                     <input
                         value={rowData?.password}
@@ -92,7 +106,7 @@ export default function EditUserModal({ open, setOpen , rowData , setRowData }) 
                             setRowData({ ...rowData, password: e.target.value })
                         }
                         type="password"
-                        placeholder="**********"
+                        placeholder=""
                     />
                 </div>
 

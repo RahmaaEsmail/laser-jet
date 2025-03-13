@@ -17,7 +17,7 @@ export default function EditInstallmentCategoryModal({
 }) {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { updateCategoryInstallmentLoading, data } = useSelector(
+  const { updateCategoryInstallmentLoading , deleteInstallmentLoading, data } = useSelector(
     (state) => state?.categories
   );
 
@@ -88,3 +88,5 @@ export default function EditInstallmentCategoryModal({
     </Modal>
   );
 }
+
+

@@ -7,104 +7,126 @@ import { createUser, fetchUsers } from "../../../features/usersSlice";
 import { useTranslation } from "react-i18next";
 
 export default function AddUserModal({ open, setOpen }) {
-    const [userData, setUserData] = useState({
-        name: "",
-        phone: "",
-        password: "",
-    });
-    const {t} = useTranslation();
-    const { addLoading } = useSelector(state => state.users);
-    const dispatch = useDispatch()
+  const [userData, setUserData] = useState({
+    name: "",
+    phone: "",
+    password: "",
+  });
+  const { t } = useTranslation();
+  const { addLoading } = useSelector((state) => state.users);
+  const dispatch = useDispatch();
 
-    // function handleSubmit(e) {
-    //     e.preventDefault();
-        
-    //     if (!userData.name) {
-    //         toast.warn("برجاء ادخال الاسم اولا!");
-    //         return;
-    //     }
-    //     if (!userData.password) {
-    //         toast.warn("برجاء ادخال كلمه السر اولا!");
-    //         return;
-    //     }
-    //     if (!userData.phone) {
-    //         toast.warn("برجاء ادخال   رقم الهاتف اولا !");
-    //         return;
-    //     }
+  function handleSubmit(e) {
+    e.preventDefault();
 
+    if (!userData.name) {
+      toast.warn("برجاء ادخال الاسم اولا!");
+      return;
+    }
+    if (!userData.password) {
+      toast.warn("برجاء ادخال كلمه السر اولا!");
+      return;
+    }
+    if (!userData.phone) {
+      toast.warn("برجاء ادخال   رقم الهاتف اولا !");
+      return;
+    }
 
+    const formData = new FormData();
+    formData.append("username", userData.name ? userData.name : "");
+    formData.append("password", userData.password ? userData.password : "");
+    formData.append("phone", userData.phone ? userData.phone : "");
+    formData.append("email", userData.email ? userData.email : "");
+    dispatch(
+      createUser({
+        username: userData.name,
+        password: userData.password,
+        phone: userData.phone,
+        email: userData.email,
+      })
+    )
+      .then((res) => {
+        console.log(res);
+        if (res?.payload?.success) {
+          toast.success(res?.payload?.message);
+          dispatch(fetchUsers());
+          setOpen(false);
+          setUserData({
+            name: "",
+            phone: "",
+            password: "",
+          });
+        } else {
+          toast.error(
+            res?.payload?.message || "There's error while creating employee"
+          );
+        }
+      })
+      .catch((e) => console.log(e));
+  }
+  return (
+    <Modal
+      title={t("addNewUserText")}
+      open={open}
+      setOpen={setOpen}
+      onCancel={() => setOpen(false)}
+      onClose={() => setOpen(false)}
+      footer={null}
+    >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+        <div className="grid grid-cols-2 gap-3 items-center">
+          <div className="w-full input-group ">
+            <label>{t("fullName")}</label>
+            <input
+              value={userData.name}
+              onChange={(e) =>
+                setUserData({ ...userData, name: e.target.value })
+              }
+              type="text"
+              placeholder={t("fullName")}
+            />
+          </div>
+          <div className="w-full input-group ">
+            <label>{t("email")}</label>
+            <input
+              value={userData.email}
+              onChange={(e) =>
+                setUserData({ ...userData, email: e.target.value })
+              }
+              type="text"
+              placeholder={t("email")}
+            />
+          </div>
+          <div className="w-full input-group ">
+            <label>{t("phone")}</label>
+            <input
+              value={userData?.phone}
+              onChange={(e) =>
+                setUserData({ ...userData, phone: e.target.value })
+              }
+              type="tel"
+              placeholder={t("phone")}
+              className=""
+            />
+          </div>
+        </div>
 
-    //     const formData = new FormData();
-    //     formData.append("username", userData.name);
-    //     formData.append("password", userData.password);
-    //     formData.append("phone", userData.phone);
-    //     dispatch(createUser({username:userData.name,password:userData.password ,phone:userData.phone})).then(res => {
-    //         console.log(res)
-    //         if (res?.payload?.success) {
-    //             toast.success(res?.payload?.message)
-    //             dispatch(fetchUsers())
-    //             setOpen(false)
-    //             setUserData({
-    //                 name: "",
-    //                 phone: "",
-    //                 password: "",
-    //             })
+        <div className="w-full input-group ">
+          <label>{t("password")}</label>
+          <input
+            value={userData?.password}
+            onChange={(e) =>
+              setUserData({ ...userData, password: e.target.value })
+            }
+            type="password"
+            placeholder="**********"
+          />
+        </div>
 
-    //         } else {
-    //             toast.error(res?.payload?.message || "There's error while creating employee")
-    //         }
-    //     }).catch(e => console.log(e))
-    // }
-    return (
-        <Modal
-            title={t("addNewUserText")}
-            open={open}
-            setOpen={setOpen}
-            onCancel={() => setOpen(false)}
-            onClose={() => setOpen(false)}
-            footer={null}
-        >
-            <form className="flex flex-col gap-3">
-                <div className="grid grid-cols-2 gap-3 items-center">
-                    <div className="w-full input-group ">
-                        <label>{t("fullName")}</label>
-                        <input
-                            value={userData.name}
-                            onChange={(e) => setUserData({...userData,name:e.target.value})}
-                            type="text"
-                            placeholder={t("fullName")}
-                        />
-                    </div>
-
-                    <div className="w-full input-group ">
-                        <label>{t("phone")}</label>
-                        <input
-                            value={userData?.phone}
-                            onChange={(e) =>
-                                setUserData({ ...userData, phone: e.target.value })
-                            }
-                            type="tel"
-                            placeholder={t("phone")}
-                            className=""
-                        />
-                    </div>
-                </div>
-
-
-                <div className="w-full input-group ">
-                    <label>{t("password")}</label>
-                    <input
-                        value={userData?.password}
-                        onChange={(e) =>
-                            setUserData({ ...userData, password: e.target.value })
-                        }
-                        type="password"
-                        placeholder="**********"
-                    />
-                </div>
-
-                <button className="bg-[#0d6efd] hover:bg-[#104ba3]  text-white p-2 rounded-sm w-full">{addLoading ? t("loadingText") : t("saveBtn")}</button>
-            </form>
-        </Modal>
-    );
+        <button className="bg-[#0d6efd] hover:bg-[#104ba3]  text-white p-2 rounded-sm w-full">
+          {addLoading ? t("loadingText") : t("saveBtn")}
+        </button>
+      </form>
+    </Modal>
+  );
 }

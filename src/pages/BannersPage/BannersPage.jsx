@@ -111,8 +111,8 @@ export default function BannersPage() {
     const formData = new FormData();
     formData.append("banner_link", bannerData.banner_link);
     formData.append("image", imgs.file);
-    formData.append("banner_title", bannerData.banner_title);
-    formData.append("banner_description", bannerData.banner_description);
+    formData.append("banner_title", "-");
+    formData.append("banner_description","-");
     formData.append("banner_target", bannerData.banner_target);
     formData.append("is_active", bannerData.is_active);
 
@@ -138,6 +138,7 @@ export default function BannersPage() {
         setBannerData({
           banner_link: "",
           banner_target: "",
+          banner_title:"",
           is_active: false,
         });
       });
@@ -162,6 +163,7 @@ export default function BannersPage() {
   }
 
   function handleEdit() {
+    console.log(rowData);
 
     const formData = new FormData();
     formData.append("banner_id",rowData?.banner_id)
@@ -200,10 +202,10 @@ export default function BannersPage() {
   return (
     <div>
       <div className="flex gap-3 justify-between my-4">
-        <h3 className="font-semibold text-[25px] text-[#0d6efd]">{t("bannerText")}</h3>
+        <h3 className="font-semibold text-[20px] md:text-[25px] text-[#0d6efd]">{t("bannerText")}</h3>
         <button
           onClick={() => setOpenAddModal(true)}
-          className="bg-[#0d6efd] text-white rounded-md p-3 flex justify-center items-center"
+          className="bg-[#0d6efd] text-white rounded-md p-1.5 md:p-3 flex justify-center items-center"
         >
           {t("addBannerText")}
         </button>
@@ -217,7 +219,7 @@ export default function BannersPage() {
         title={t("editBannerText")}
       >
         <div className="flex flex-col gap-3">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div className="input-group">
             <label>{t("targetText")}</label>
             <input
@@ -226,25 +228,18 @@ export default function BannersPage() {
               onChange={(e) => setRowData({ ...rowData, banner_target: e.target.value })}
             />
           </div>
-
+          
           <div className="input-group">
-            <label>{t("titleText")}</label>
+          <label>{t("bannerLinkText")}</label>
             <input
               type="text"
-              value={rowData?.banner_title}
-              onChange={(e) => setRowData({ ...rowData, banner_title: e.target.value })}
+              value={rowData?.banner_link}
+              onChange={(e) =>
+                setRowData({ ...rowData, banner_link: e.target.value })
+              }
             />
           </div>
-          </div>
-
-          <div className="input-group">
-            <label>{t("description")}</label>
-            <textarea
-              value={rowData.banner_description}
-              onChange={(e) =>
-                setRowData({ ...bannerData, banner_description: e.target.value })
-              }
-            ></textarea>
+         
           </div>
 
           <div className="input-group">
@@ -275,17 +270,8 @@ export default function BannersPage() {
         title={t("addBannerText")}
       >
         <div className="flex flex-col gap-3">
-          <div className="grid grid-cols-2 gap-2">
-            <div className="input-group">
-              <label>{t("fullName")}</label>
-              <input
-                type="text"
-                value={bannerData?.banner_title}
-                onChange={(e) =>
-                  setBannerData({ ...bannerData, banner_title: e.target.value })
-                }
-              />
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            
 
             <div className="input-group">
               <label>{t("targetText")}</label>
@@ -300,9 +286,8 @@ export default function BannersPage() {
                 }
               />
             </div>
-          </div>
 
-          <div className="input-group">
+            <div className="input-group">
             <label>{t("bannerLinkText")}</label>
             <input
               type="text"
@@ -312,6 +297,9 @@ export default function BannersPage() {
               }
             />
           </div>
+          </div>
+
+          
 
           {/* <div className="input-group">
             <label>Description</label>
@@ -324,7 +312,7 @@ export default function BannersPage() {
           </div> */}
 
           <div className="flex gap-3 items-center">
-            <label>{t("isActive")}</label>
+            <label>{t("isActiveText")}</label>
             <Switch
               defaultChecked={bannerData.is_active}
               onChange={(e) => setBannerData({ ...bannerData, is_active: e })}
@@ -394,7 +382,7 @@ export default function BannersPage() {
           <Spin size="large" />
         </div>
       ) : (
-        <Table columns={columns} dataSource={data?.data?.banners} />
+        <Table scroll={{x : "max-content"}} columns={columns} dataSource={data?.data?.banners} />
       )}
     </div>
   );

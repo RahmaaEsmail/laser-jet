@@ -1,14 +1,19 @@
 import { Dropdown, Menu, Modal, Spin } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addCategories,
   fetchCategories,
+  handleDeleteInstallment,
+  handleDeleteInstallmentCategory,
+  handleEditInstallment,
 } from "../../../features/categoriesSlice";
 import { toast } from "react-toastify";
 import { FaTrash } from "react-icons/fa6";
 import { FaEdit, FaEllipsisV } from "react-icons/fa";
+// import DeleteInstallmentCategoryModal from "../DeleteInstallmentCategoryModal/DeleteInstallmentCategoryModal";
+import { handleFetchInstallment } from "../../../features/installemntsSlice";
 
 export default function AddCategoryModal({
   openAddModal,
@@ -22,17 +27,18 @@ export default function AddCategoryModal({
   setOpenInstallmentsModal,
 }) {
   const { t } = useTranslation();
-  const { addLoading } = useSelector((state) => state.categories);
+  const { addLoading, editInstallment, deleteInstallmentLoading } = useSelector(
+    (state) => state.categories
+  );
   const dispatch = useDispatch();
   const { data: installments, loading: installmentLoading } = useSelector(
     (state) => state?.installments
   );
-  const [deleteModal , setDeleteModal] = useState(false);
-  const [editModal , setEditModal] = useState(false);
-  const [installmentData , setInstallmentData] = useState({});
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [editModal, setEditModal] = useState(false);
+  const [installmentData, setInstallmentData] = useState({});
 
-  function handleInstallmentChange(event) {
-    const id = event.target.value;
+  function handleInstallmentChange(id) {
     console.log(id);
     const value = installments?.data?.installmentTitles?.find(
       (item) => item?.installment_id == id
@@ -62,72 +68,122 @@ export default function AddCategoryModal({
 
   function handleSubmit(e) {
     e.preventDefault();
-     if(!productSectionData?.title) {
+    if (!productSectionData?.title) {
       toast.warn("ادخل عنوان الفئة اةلا");
       return;
-     }
+    }
 
-     if(!productSectionData?.description) {
+    if (!productSectionData?.description) {
       toast.warn("ادخل وصف الفئة اةلا");
       return;
-     }
+    }
 
-     const emptyVal = selectedInputs?.some(item => !item.value);
-     if(emptyVal) {
+    const emptyVal = selectedInputs?.some((item) => !item.value);
+    if (emptyVal) {
       toast.warn("برجاء ادخال جميع قيم القسط");
       return;
-     }
+    }
 
-     if(!imgs?.file) {
+    if (!imgs?.file) {
       toast.warn("ادخل صوره الفئة اةلا");
       return;
-     }
+    }
 
-     const formData = new FormData();
-     formData.append("title", productSectionData.title);
-     formData.append("description", productSectionData.description);
-     formData.append("image", imgs.file);
-     formData.append("gain", productSectionData.gain);
-     selectedInputs.forEach((item , key) => (
-      formData.append(`data[${key}][installment_id]` , item?.installment_id),
-      formData.append(`data[${key}][value]` , item?.value)
-    ))
+    const formData = new FormData();
+    formData.append("title", productSectionData.title);
+    formData.append("description", productSectionData.description);
+    formData.append("image", imgs.file);
+    formData.append("gain", productSectionData.gain);
+    selectedInputs.forEach(
+      (item, key) => (
+        formData.append(`data[${key}][installment_id]`, item?.installment_id),
+        formData.append(`data[${key}][value]`, item?.value)
+      )
+    );
 
-     dispatch(addCategories(formData)).then(res => {
-      if(res?.payload?.success) {
-        toast.success(res?.payload.message)
-        dispatch(fetchCategories({page:1,per_page:7, keywords:""}))
+    dispatch(addCategories(formData))
+      .then((res) => {
+        if (res?.payload?.success) {
+          toast.success(res?.payload.message);
+          dispatch(fetchCategories({ page: 1, per_page: 7, keywords: "" }));
+          setOpenAddModal(false);
+          setProductSectionData({
+            title: "",
+            description: "",
+            image: "",
+            gain: null,
+          });
+          setSelectedInputs([]);
+          setImgs({
+            file: null,
+            url: "",
+          });
+        } else {
+          toast.error(res?.payload);
+        }
+      })
+      .catch((e) => console.log(e))
+      .finally(() => {
         setOpenAddModal(false);
         setProductSectionData({
-          title:"",
-          description:"",
-          image:"",
-          gain:null,
-        })
-        setSelectedInputs([]);
+          title: "",
+          description: "",
+          image: "",
+          gain: null,
+        });
         setImgs({
-          file:null,
-          url:"",
-        })
-      }else {
-        toast.error(res?.payload)
-      }
-     }).catch(e => console.log(e))
-     .finally(() => {
-      setOpenAddModal(false);
-      setProductSectionData({
-        title:"",
-        description:"",
-        image:"",
-        gain:null
-      })
-      setImgs({
-        file:null,
-        url:"",
-      })
-      setSelectedInputs([]);
-     })
+          file: null,
+          url: "",
+        });
+        setSelectedInputs([]);
+      });
   }
+
+  function handleDelete() {
+    const data_send = {
+      installment_id: installmentData?.installment_id,
+    };
+
+    dispatch(handleDeleteInstallment(data_send))
+      .unwrap()
+      .then((res) => {
+        console.log(res)
+        if (res?.success) {
+          toast.success(res?.message);
+          setDeleteModal(false);
+          dispatch(handleFetchInstallment());
+        } else {
+          toast.error(res);
+        }
+      })
+      .catch((e) => console.log(e));
+  }
+
+  function handleEdit() {
+    const data_send = {
+      installment_number: installmentData?.installment_number,
+      installment_id: installmentData?.installment_id,
+      installment_title: installmentData?.installment_title,
+    };
+
+    dispatch(handleEditInstallment(data_send))
+      .unwrap()
+      .then((res) => {
+        console.log(res);
+        if (res?.success) {
+          toast.success(res?.message);
+          setEditModal(false);
+          dispatch(handleFetchInstallment());
+        } else {
+          toast.error(res);
+        }
+      })
+      .catch((e) => console.log(e));
+  }
+
+  useEffect(() => {
+    console.log(installmentData)
+  } ,[installmentData])
 
   return (
     <Modal
@@ -179,117 +235,144 @@ export default function AddCategoryModal({
 
         <div className="input-group">
           <div className="flex flex-col gap-3">
-        <div className="input-group">
-         <div className="flex justify-between items-center">
-         <label>{t("PercentageIncreaseInPremium")}</label>
-          <button
-            onClick={() => setOpenInstallmentsModal(true)}
-            className="w-fit bg-blue-500 p-2 text-white cursor-pointer rounded-md"
-          >
-            {t("createInstallment")}
-          </button>
-         </div>
-        </div>
-
-        {/* Custom Installment Dropdown Instead of <select> */}
-        <Dropdown
-          overlay={
-            <Menu>
-              {installmentLoading ? (
-                <Spin size="md" />
-              ) : (
-                installments?.data?.installmentTitles?.map((item) => (
-                  <Menu.Item key={item.installment_id}>
-                    <div className="flex justify-between items-center w-full">
-                      <span onClick={() => handleInstallmentChange(item.installment_id)}>
-                        {item.installment_title}
-                      </span>
-                      <div className="flex gap-2">
-                        <FaEdit
-                          className="text-blue-500 cursor-pointer"
-                          onClick={() => {
-                            setDeleteModal(true)
-                            setInstallmentData(item)
-                          }}
-                        />
-                        <FaTrash
-                          className="text-red-500 cursor-pointer"
-                          onClick={() => {
-                            setDeleteModal(true)
-                            setInstallmentData(item)
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </Menu.Item>
-                ))
-              )}
-            </Menu>
-          }
-          trigger={["click"]}
-        >
-          <button className="p-2 bg-gray-200 rounded-md w-full flex justify-between">
-            {t("chooseInstallmentText")}
-            <FaEllipsisV />
-          </button>
-        </Dropdown>
-
-        {/* Selected Installments */}
-        {selectedInputs?.map((item) => (
-          <div className="input-group flex justify-between items-center" key={item?.installment_id}>
-            <label>
-              {t("ValueForText")} {item?.installment_title}:
-            </label>
-            <input
-              type="text"
-              value={item?.value}
-              onChange={(e) => handleInputChange(e, item?.installment_id)}
-              className="p-2 border rounded-md"
-            />
-            <FaTrash
-              className="text-red-500 cursor-pointer"
-              onClick={() => handleDeleteInstallment(item?.installment_id)}
-            />
-          </div>
-        ))}
-      </div>
-
-          {/* <select
-            className="p-[2vh] w-fit border rounded-md"
-            onChange={(e) => handleInstallmentChange(e)}
-          >
-            <option value="" disabled selected>
-              {t("chooseInstallmentText")}
-            </option>
-            {installmentLoading ? (
-              <Spin size="md" />
-            ) : (
-              installments?.data?.installmentTitles?.map((item) => (
-                <option
-                  className="flex justify-between items-center"
-                  key={item.installment_id}
-                  value={item?.installment_id}
+            <div className="input-group">
+              <div className="flex justify-between items-center">
+                <label>{t("PercentageIncreaseInPremium")}</label>
+                <button
+                  onClick={() => setOpenInstallmentsModal(true)}
+                  className="w-fit bg-blue-500 p-2 text-white cursor-pointer rounded-md"
                 >
-                  <span>{item.installment_title}</span>
-                  <FaTrash className="text-red-500" />
-                </option>
-              ))
-            )}
-          </select> */}
-        </div>
+                  {t("createInstallment")}
+                </button>
+              </div>
+            </div>
 
-        {selectedInputs?.map((item) => (
-          <div className="input-group" key={item?.installment_id}>
-            <label>
-              {t("ValueForText")} {item?.installment_title}:
-            </label>
-            <input
-              type="text"
-              value={item?.value}
-              onChange={(e) => handleInputChange(e, item?.installment_id)}
-            />
+            <Dropdown
+              overlay={
+                <Menu>
+                  {installmentLoading ? (
+                    <Spin size="md" />
+                  ) : (
+                    installments?.data?.installmentTitles?.map((item) => (
+                      <Menu.Item key={item.installment_id}>
+                        <div
+                          onClick={() =>
+                            handleInstallmentChange(item.installment_id)
+                          }
+                          className="flex justify-between items-center w-full"
+                        >
+                          <span>{item.installment_title}</span>
+                          <div className="flex gap-2">
+                            <FaEdit
+                              className="text-blue-500 cursor-pointer"
+                              onClick={() => {
+                                setEditModal(true);
+                                setInstallmentData(item);
+                              }}
+                            />
+                            <FaTrash
+                              className="text-red-500 cursor-pointer"
+                              onClick={() => {
+                                setDeleteModal(true);
+                                setInstallmentData(item);
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </Menu.Item>
+                    ))
+                  )}
+                </Menu>
+              }
+              trigger={["click"]}
+            >
+              <button className="p-2 bg-gray-200 rounded-md w-full flex justify-between">
+                {t("chooseInstallmentText")}
+                <FaEllipsisV />
+              </button>
+            </Dropdown>
+
+            <Modal
+              open={deleteModal}
+              onOk={handleDelete}
+              onCancel={() => setDeleteModal(false)}
+              onClose={() => setDeleteModal(false)}
+              okText={
+                deleteInstallmentLoading ? t("loadingText") : t("deleteText")
+              }
+              cancelText={t("cancelText")}
+            >
+              <h2>{t("deleteInstallmentText")}</h2>
+            </Modal>
+
+            <Modal
+              open={editModal}
+              onOk={handleEdit}
+              onCancel={() => setEditModal(false)}
+              onClose={() => setEditModal(false)}
+              okText={editInstallment ? t("loadingText") : t("editText")}
+              cancelText={t("cancelText")}
+            >
+              <div className="input-group">
+                <label>{t("installmentTitle")}</label>
+                <input
+                  type="text"
+                  value={installmentData?.installment_title}
+                  onChange={(e) =>
+                    setInstallmentData({
+                      ...installmentData,
+                      installment_title: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="input-group">
+                <label>{t("installment_number")}</label>
+                <input
+                  type="text"
+                  value={installmentData?.installment_number}
+                  onChange={(e) =>
+                    setInstallmentData({
+                      ...installmentData,
+                      installment_number: +e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </Modal>
+            {selectedInputs?.map((item) => (
+              <div className="flex gap-3 justify-between items-center">
+                {" "}
+                <div
+                  className="input-group flex justify-between"
+                  key={item?.installment_id}
+                >
+                  <label>
+                    {t("ValueForText")} {item?.installment_title}:
+                  </label>
+                  <input
+                    type="text"
+                    value={item?.value}
+                    onChange={(e) => handleInputChange(e, item?.installment_id)}
+                    className="p-2 border rounded-md"
+                  />
+                </div>
+                <FaTrash
+                  className="text-red-500 cursor-pointer my-auto"
+                  onClick={() => {
+                    console.log(item?.installment_id)
+                    setSelectedInputs((prev) =>
+                      prev.filter((item) => item.installment_id != item?.installment_id)
+                    );
+                    // handleDelete(item?.installment_id)
+                    // dispatch(handleDeleteInstallment({installment_id : item?.installment_id}))
+                  }}
+                />
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
 
         <div className="input-group">
           <label>{t("imagesText")}</label>

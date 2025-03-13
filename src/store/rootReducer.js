@@ -10,6 +10,7 @@ import socialsReducer from  '../features/SocialLinksSlice';
 import settingsReducer from  '../features/settingsSlice';
 import notificationsReducer from  '../features/NotificationSlice';
 import installmentReducer from '../features/installemntsSlice';
+import ordersReducer from '../features/ordersSlice';
 
 export const rootReducers = combineReducers({
     login: loginReducer,
@@ -22,5 +23,6 @@ export const rootReducers = combineReducers({
     socials: socialsReducer,
     settings : settingsReducer,
     notifications:notificationsReducer,
-    installments: installmentReducer
+    installments: installmentReducer,
+    orders : ordersReducer
 })

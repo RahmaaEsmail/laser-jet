@@ -34,10 +34,9 @@ export default function ProductsPage() {
   useEffect(() => {
     if (searchVal && searchVal?.length)
       dispatch(fetchProducts({ page: 1, per_page: 7, keywords: searchVal }));
+    else dispatch(fetchProducts({ page: 1, per_page: 7 }));
   }, [searchVal]);
- useEffect(() => {
-      dispatch(fetchProducts({ page: 1, per_page: 7}));
-  }, []);
+
   const columns = [
     {
       dataIndex: "product_id",
@@ -74,6 +73,7 @@ export default function ProductsPage() {
       dataIndex: "details",
       key: "details",
       title: t("detailsText"),
+      ellipsis: true,
       render: (row) => (
         <div className="flex flex-col gap-2">
           {row?.map((item) => (
@@ -172,12 +172,12 @@ export default function ProductsPage() {
   return (
     <div>
       <div className="flex gap-3 justify-between my-4">
-        <h3 className="font-semibold text-[25px] text-[#0d6efd]">
+        <h3 className="font-semibold text-[20px] md:text-[25px] text-[#0d6efd]">
           {t("productsText")}
         </h3>
         <button
           onClick={() => setOpenAddModal(true)}
-          className="bg-[#0d6efd] text-white rounded-md p-3 flex justify-center items-center"
+          className="bg-[#0d6efd] text-white rounded-md p-1 md:p-3 flex justify-center items-center"
         >
           {t("addProductText")}
         </button>
@@ -248,6 +248,7 @@ export default function ProductsPage() {
         </div>
       ) : (
         <Table
+          scroll={{ x:'max-content' }}
           columns={columns}
           dataSource={data?.data?.products?.length ? data?.data?.products : []}
         />

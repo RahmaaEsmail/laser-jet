@@ -10,6 +10,7 @@ import {
   FaArrowRightFromBracket,
 } from "react-icons/fa6";
 import { conifgs } from "../../config";
+import LoginPage from "../../pages/LoginPage/LoginPage";
 
 export default function SideBar({ open, setOpen }) {
   const [activeMenus, setActiveMenus] = useState({});
@@ -21,13 +22,14 @@ export default function SideBar({ open, setOpen }) {
 
   function handleLogout() {
     localStorage.removeItem(conifgs.localStorageTokenName);
-    navigate("/login")
+    // navigate("/login")
+    return <LoginPage />
   }
    
   return (
     <Drawer
       width="300px"
-      placement="right"
+      placement={lang == "ar" ? "right" :"left"}
       onClose={() => setOpen(false)}
       open={open}
     >
@@ -68,7 +70,7 @@ export default function SideBar({ open, setOpen }) {
                         }
                       >
                         <item.icon />
-                        <span>{ele?.labelAr}</span>
+                        <span>{lang == "ar" ? ele?.labelAr : ele?.labelEn}</span>
                       </NavLink>
                     ))}
                   </ul>
